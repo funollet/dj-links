@@ -4,6 +4,13 @@ from djapps.tags.models import Tag
 from djapps.tags import fields
 
 
+STATUS_CHOICES = (
+    ('drf', _('draft')),
+    ('rvs', _('revision')),
+    ('pbl', _('public')),
+    ('hid', _('hidden')),
+    )
+
 class LinkCategory (models.Model):
 
     name = models.CharField (_('name'), maxlength=200, )
@@ -67,9 +74,19 @@ class LinkCategory (models.Model):
     
 
 
-class LinksPerCategory (models.Manager):
+class PublicManager (models.Manager):
     def get_query_set (self):
-        return super(LinksPerCategory, self).get_query_set().order_by('category', 'pub_date',)
+        return super(PublicManager, self).get_query_set().filter(status='pbl')
+
+class CategorizedManager (models.Manager):
+    def get_query_set (self):
+        return super(CategorizedManager, self).get_query_set().order_by('category', 'pub_date',)
+
+class PublicCategorizedManager (models.Manager):
+    def get_query_set (self):
+        return super(PublicCategorizedManager,
+            self).get_query_set().filter(status='pbl').order_by('category', 'pub_date',)
+
 
 
 class Link (models.Model):
@@ -83,6 +100,12 @@ class Link (models.Model):
         help_text = markup_help['docutils']
     )
 
+    status = models.CharField (_('status'), maxlength=3, 
+        choices=STATUS_CHOICES,
+        default='pbl',
+        radio_admin=True,
+        )
+    
     category = models.ForeignKey ( LinkCategory,
         verbose_name=_('category'),
         blank = True,
@@ -103,13 +126,12 @@ class Link (models.Model):
         prepopulate_from = ('name',),
         unique = True,
     )
-
-    tags = fields.TagsField(Tag,
-        blank = True,
-    )
+    tags = fields.TagsField(Tag, blank = True, )
 
     objects = models.Manager()
-    categorized = LinksPerCategory()
+    public = PublicManager()
+    categorized = CategorizedManager()
+    public_categorized = PublicCategorizedManager()
 
     class Meta:
         verbose_name = _('link')
@@ -119,10 +141,10 @@ class Link (models.Model):
 
     class Admin:
         list_display = ('name', 'url', 'pub_date',)
-        list_filter = ('category',)
+        list_filter = ('status', 'category',)
         search_fields = ('name',)
         fields = (
-            (None, {'fields': ( ('name', 'category',), 'url', 
+            (None, {'fields': ( ('name', 'url'), ('status', 'category',), 
                 'description_markup', 'tags', 'via_name', 'via_url',),}),
             (_('Advanced'), {'fields': ('permalink','pub_date',),
                     'classes': 'collapse',}),
