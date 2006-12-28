@@ -1,0 +1,140 @@
+from django.db import models
+from djapps.misc.markup import markup_help, parse_markup
+from djapps.tags.models import Tag
+from djapps.tags import fields
+
+
+class LinkCategory (models.Model):
+
+    name = models.CharField (_('name'), maxlength=200, )
+    
+    description= models.TextField (_('description'), editable=False,)
+    description_markup = models.TextField (_('description'), 
+        blank=True,
+        help_text = markup_help['docutils'],
+        )
+    
+    priority = models.PositiveIntegerField (_('priority'),
+        unique = True,
+        help_text = _('Categories will be sorted by this field.')
+    )
+    
+    permalink = models.SlugField (_('permalink'),
+        unique=True,
+        prepopulate_from=('name',),
+        help_text = _('Easy-to-link name (good, if short, twice good).'),
+        )
+    
+    pub_date = models.DateTimeField (_('publication date'), auto_now=True,)
+
+    icon = models.ImageField (_('icon'),
+        upload_to = 'events/category',
+        blank = True,
+        height_field = 'icon_height', width_field = 'icon_width',
+        help_text = _('Optional icon for the category.'),
+    )
+    # bug#1537  : height and width aren't refreshed on re-save
+    icon_height = models.IntegerField(_('icon height'), blank = True, null=True,)
+    icon_width = models.IntegerField(_('icon width'), blank = True, null=True, )
+
+
+
+    class Meta:
+        verbose_name = _('link category')
+        verbose_name_plural = _('link categories')
+        ordering = ['priority']
+    class Admin:
+        fields = (
+            (None, {'fields': ('name', 'description_markup', 'priority',),}),
+            (_('Advanced'), {
+                'fields': ('permalink', 'pub_date', 'icon',), 
+                'classes': 'collapse',
+            } ),
+        )
+        list_display = ('name', 'priority',)
+
+    
+    def __str__ (self):
+        return self.name
+
+    def save (self):
+        parse_markup (self)
+        super(LinkCategory, self).save()
+
+    #def get_absolute_url (self):
+        #pass
+    
+    
+
+
+class LinksPerCategory (models.Manager):
+    def get_query_set (self):
+        return super(LinksPerCategory, self).get_query_set().order_by('category', 'pub_date',)
+
+
+class Link (models.Model):
+    """Link (url, name, description) with metadata: category, tags, and source."""
+    name = models.CharField (_('name'), maxlength=200, )
+    url = models.URLField (_('url'), verify_exists=False)
+
+    description = models.TextField (_('description'), editable=False,)
+    description_markup = models.TextField (_('description'), 
+        blank=True,
+        help_text = markup_help['docutils']
+    )
+
+    category = models.ForeignKey ( LinkCategory,
+        verbose_name=_('category'),
+        blank = True,
+    )
+    
+    via_name = models.CharField ( _('via (name)'), 
+        maxlength=200, 
+        blank=True,
+        help_text = 'Source of the link. Brief description.',
+    )
+    via_url = models.URLField (_('via (url)'), verify_exists=False,
+        blank=True,
+        help_text = 'Source of the link. URL.'
+    )
+    
+    pub_date = models.DateTimeField (_('publication date'), auto_now=True,)
+    permalink = models.SlugField (_('permalink'),
+        prepopulate_from = ('name',),
+        unique = True,
+    )
+
+    tags = fields.TagsField(Tag,
+        blank = True,
+    )
+
+    objects = models.Manager()
+    categorized = LinksPerCategory()
+
+    class Meta:
+        verbose_name = _('link')
+        verbose_name_plural = _('links')
+        order_with_respect_to = 'category'
+        ordering = ['pub_date']
+
+    class Admin:
+        list_display = ('name', 'url', 'pub_date',)
+        list_filter = ('category',)
+        search_fields = ('name',)
+        fields = (
+            (None, {'fields': ( ('name', 'category',), 'url', 
+                'description_markup', 'tags', 'via_name', 'via_url',),}),
+            (_('Advanced'), {'fields': ('permalink','pub_date',),
+                    'classes': 'collapse',}),
+        )
+
+    def __str__ (self):
+        return self.name
+
+    def save (self):
+        parse_markup (self)
+        super(Link, self).save()
+
+    #def get_absolute_url (self):
+        #pass
+

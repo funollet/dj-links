@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% regroup object_list by category as grouped %}
+<ul class="category">
+{% for group in grouped %}
+    <li>{{ group.grouper }}
+    <ul class="link">
+        {% for item in group.list %}
+            <li>
+            <a href="{{ item.url }}">{{ item.name }}</a>
+            {% if item.description %}
+                <p>{{ item.description }}</p>
+            {% endif %}
+            {% if item.via_url %}
+                <p>Via: <a href="{{ item.via_url }}">{{ item.via_name }}</a></p>
+            {% endif %}
+            {% if not item.via_url %}
+                {% if item.via_name %}
+                <p>Via: {{ item.via_name }}</p>
+                {% endif %}
+            {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    </li>
+{% endfor %}
+</ul>
+
+{% endblock %}
