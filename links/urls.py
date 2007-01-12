@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from uecweb.links.models import Link
+from links.models import Link
 
 link_dict = { 'queryset': Link.public_categorized.all() }
 #link_dict_permalink = dict(link_dict, slug_field='permalink')
