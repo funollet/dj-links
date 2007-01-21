@@ -32,7 +32,9 @@ class LinkCategory (models.Model):
         help_text = _('Easy-to-link name (good, if short, twice good).'),
         )
     
-    pub_date = models.DateTimeField (_('publication date'), auto_now=True,)
+    pub_date = models.DateTimeField (_('publication date'), default=models.LazyDate(),)
+    modif_date = models.DateTimeField (_('modification date'), auto_now=True,)
+    crea_date = models.DateTimeField (_('creation date'), auto_now_add=True,)
 
     icon = models.ImageField (_('icon'),
         upload_to = 'events/category',
@@ -121,7 +123,9 @@ class Link (models.Model):
         help_text = 'Source of the link. URL.'
     )
     
-    pub_date = models.DateTimeField (_('publication date'), auto_now=True,)
+    pub_date = models.DateTimeField (_('publication date'), default=models.LazyDate(),)
+    modif_date = models.DateTimeField (_('modification date'), auto_now=True,)
+    crea_date = models.DateTimeField (_('creation date'), auto_now_add=True,)
     permalink = models.SlugField (_('permalink'),
         prepopulate_from = ('name',),
         unique = True,
