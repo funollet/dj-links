@@ -3,7 +3,7 @@
 {% block content %}
 
 {% regroup object_list by category as grouped %}
-<ul class="category">
+<ul class="link-category">
 {% for group in grouped %}
     <li>{{ group.grouper }}
     <ul class="link">

@@ -19,7 +19,7 @@ class LinkCategory (models.Model):
     description_markup = models.TextField (_('description'), 
         blank=True,
         help_text = markup_help['docutils'],
-        )
+    )
     
     priority = models.PositiveIntegerField (_('priority'),
         unique = True,
@@ -30,7 +30,7 @@ class LinkCategory (models.Model):
         unique=True,
         prepopulate_from=('name',),
         help_text = _('Easy-to-link name (good, if short, twice good).'),
-        )
+    )
     
     pub_date = models.DateTimeField (_('publication date'), default=models.LazyDate(),)
     modif_date = models.DateTimeField (_('modification date'), auto_now=True,)
@@ -46,7 +46,9 @@ class LinkCategory (models.Model):
     icon_height = models.IntegerField(_('icon height'), blank = True, null=True,)
     icon_width = models.IntegerField(_('icon width'), blank = True, null=True, )
 
-
+    hidden = models.BooleanField(_('hidden category'), default=False,
+        help_text = 'Exclude this category from listings.',
+    )
 
     class Meta:
         verbose_name = _('link category')
@@ -56,7 +58,7 @@ class LinkCategory (models.Model):
         fields = (
             (None, {'fields': ('name', 'description_markup', 'priority',),}),
             (_('Advanced'), {
-                'fields': ('permalink', 'pub_date', 'icon',), 
+                'fields': ('permalink', 'pub_date', 'icon', 'hidden'), 
                 'classes': 'collapse',
             } ),
         )
