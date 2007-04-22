@@ -2,9 +2,9 @@ from django.conf.urls.defaults import *
 from links.models import Link
 
 link_dict = { 'queryset': Link.public_categorized.all() }
-#link_dict_permalink = dict(link_dict, slug_field='permalink')
+#link_dict_easyname = dict(link_dict, slug_field='easyname')
 #categ_dict = {'queryset': LinkCategory.objects.all() }
-#categ_dict_slug = dict(categ_dict, slug_field='permalink')
+#categ_dict_slug = dict(categ_dict, slug_field='easyname')
 
 urlpatterns = patterns('django.views.generic.list_detail',
     (r'^$', 'object_list', link_dict),

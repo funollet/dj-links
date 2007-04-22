@@ -26,7 +26,7 @@ class LinkCategory (models.Model):
         help_text = _('Categories will be sorted by this field.')
     )
     
-    permalink = models.SlugField (_('permalink'),
+    easyname = models.SlugField (_('easyname'),
         unique=True,
         prepopulate_from=('name',),
         help_text = _('Easy-to-link name (good, if short, twice good).'),
@@ -58,7 +58,7 @@ class LinkCategory (models.Model):
         fields = (
             (None, {'fields': ('name', 'description_markup', 'priority',),}),
             (_('Advanced'), {
-                'fields': ('permalink', 'pub_date', 'icon', 'hidden'), 
+                'fields': ('easyname', 'pub_date', 'icon', 'hidden'), 
                 'classes': 'collapse',
             } ),
         )
@@ -128,7 +128,7 @@ class Link (models.Model):
     pub_date = models.DateTimeField (_('publication date'), default=models.LazyDate(),)
     modif_date = models.DateTimeField (_('modification date'), auto_now=True,)
     crea_date = models.DateTimeField (_('creation date'), auto_now_add=True,)
-    permalink = models.SlugField (_('permalink'),
+    easyname = models.SlugField (_('easyname'),
         prepopulate_from = ('name',),
         unique = True,
     )
@@ -151,8 +151,10 @@ class Link (models.Model):
         search_fields = ('name',)
         fields = (
             (None, {'fields': ( ('name', 'url'), ('status', 'category',), 
-                'description_markup', 'tags', 'via_name', 'via_url',),}),
-            (_('Advanced'), {'fields': ('permalink','pub_date',),
+                'description_markup', 'tags',),}),
+            (_('Via'), {'fields': ('via_name','via_url',),
+                    'classes': 'collapse',}),
+            (_('Advanced'), {'fields': ('easyname','pub_date',),
                     'classes': 'collapse',}),
         )
 
