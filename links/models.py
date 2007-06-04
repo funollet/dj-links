@@ -2,6 +2,7 @@ from django.db import models
 from misc.markup import markup_help, parse_markup
 from tags.models import Tag
 from tags import fields
+from datetime import datetime
 
 
 STATUS_CHOICES = (
@@ -32,7 +33,7 @@ class LinkCategory (models.Model):
         help_text = _('Easy-to-link name (good, if short, twice good).'),
     )
     
-    pub_date = models.DateTimeField (_('publication date'), default=models.LazyDate(),)
+    pub_date = models.DateTimeField (_('publication date'), default=datetime.now,)
     modif_date = models.DateTimeField (_('modification date'), auto_now=True,)
     crea_date = models.DateTimeField (_('creation date'), auto_now_add=True,)
 
@@ -125,7 +126,7 @@ class Link (models.Model):
         help_text = 'Source of the link. URL.'
     )
     
-    pub_date = models.DateTimeField (_('publication date'), default=models.LazyDate(),)
+    pub_date = models.DateTimeField (_('publication date'), default=datetime.now,)
     modif_date = models.DateTimeField (_('modification date'), auto_now=True,)
     crea_date = models.DateTimeField (_('creation date'), auto_now_add=True,)
     easyname = models.SlugField (_('easyname'),
