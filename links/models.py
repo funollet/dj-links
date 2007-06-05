@@ -34,8 +34,8 @@ class LinkCategory (models.Model):
     )
     
     pub_date = models.DateTimeField (_('publication date'), default=datetime.now,)
-    modif_date = models.DateTimeField (_('modification date'), auto_now=True,)
-    crea_date = models.DateTimeField (_('creation date'), auto_now_add=True,)
+    modif_date = models.DateTimeField (_('modification date'), default=datetime.now, editable=False,)
+    crea_date = models.DateTimeField (_('creation date'), editable=False,)
 
     icon = models.ImageField (_('icon'),
         upload_to = 'events/category',
@@ -71,6 +71,8 @@ class LinkCategory (models.Model):
 
     def save (self):
         parse_markup (self)
+        if not self.id:
+            self.crea_date = datetime.now()
         super(LinkCategory, self).save()
 
     #def get_absolute_url (self):
@@ -127,8 +129,8 @@ class Link (models.Model):
     )
     
     pub_date = models.DateTimeField (_('publication date'), default=datetime.now,)
-    modif_date = models.DateTimeField (_('modification date'), auto_now=True,)
-    crea_date = models.DateTimeField (_('creation date'), auto_now_add=True,)
+    modif_date = models.DateTimeField (_('modification date'), default=datetime.now, editable=False,)
+    crea_date = models.DateTimeField (_('creation date'), editable=False,)
     easyname = models.SlugField (_('easyname'),
         prepopulate_from = ('name',),
         unique = True,
@@ -164,6 +166,8 @@ class Link (models.Model):
 
     def save (self):
         parse_markup (self)
+        if not self.id:
+            self.crea_date = datetime.now()
         super(Link, self).save()
 
     #def get_absolute_url (self):
