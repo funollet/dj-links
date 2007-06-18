@@ -1,4 +1,4 @@
 Requirements:
     
-    * tags application
+    * django-tagging application
     * misc application

@@ -1,8 +1,7 @@
 from django.db import models
 from misc.markup import markup_help, parse_markup
-from tags.models import Tag
-from tags import fields
 from datetime import datetime
+from tagging.fields import TagField
 
 
 STATUS_CHOICES = (
@@ -135,7 +134,7 @@ class Link (models.Model):
         prepopulate_from = ('name',),
         unique = True,
     )
-    tags = fields.TagsField(Tag, blank = True, )
+    tags = TagField()
 
     objects = models.Manager()
     public = PublicManager()
