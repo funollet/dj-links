@@ -65,7 +65,7 @@ class LinkCategory (models.Model):
         list_display = ('name', 'priority',)
 
     
-    def __str__ (self):
+    def __unicode__ (self):
         return self.name
 
     def save (self):
@@ -160,7 +160,7 @@ class Link (models.Model):
                     'classes': 'collapse',}),
         )
 
-    def __str__ (self):
+    def __unicode__ (self):
         return self.name
 
     def save (self):
