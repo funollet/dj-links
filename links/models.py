@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, connection
 from misc.markup import markup_help, parse_markup
 from datetime import datetime
 from tagging.fields import TagField
@@ -13,6 +13,16 @@ STATUS_CHOICES = (
 
 class LinkCategory (models.Model):
 
+    def priority_default (increment=10):
+        """Returns next suitable value for 'priority' field."""
+        cursor = connection.cursor()
+        cursor.execute("SELECT MAX(priority) FROM links_linkcategory ;")
+        row = cursor.fetchone()
+        try:
+            return row[0] + increment
+        except:
+            return increment
+    
     name = models.CharField (_('name'), maxlength=200, )
     
     description= models.TextField (_('description'), editable=False,)
@@ -23,7 +33,8 @@ class LinkCategory (models.Model):
     
     priority = models.PositiveIntegerField (_('priority'),
         unique = True,
-        help_text = _('Categories will be sorted by this field.')
+        help_text = _('Categories will be sorted by this field.'),
+        default = priority_default,
     )
     
     easyname = models.SlugField (_('easyname'),
@@ -56,9 +67,9 @@ class LinkCategory (models.Model):
         ordering = ['priority']
     class Admin:
         fields = (
-            (None, {'fields': ('name', 'description_markup', 'priority',),}),
+            (None, {'fields': ('name', 'description_markup',),}),
             (_('Advanced'), {
-                'fields': ('easyname', 'pub_date', 'icon', 'hidden'), 
+                'fields': ('easyname', 'priority', 'pub_date', 'icon', 'hidden'), 
                 'classes': 'collapse',
             } ),
         )
