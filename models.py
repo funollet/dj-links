@@ -25,10 +25,9 @@ class LinkCategory (models.Model):
     
     name = models.CharField (_('name'), maxlength=200, )
     
-    description= models.TextField (_('description'), editable=False,)
-    description_markup = models.TextField (_('description'), 
+    description= models.TextField (_('description'),
         blank=True,
-        help_text = markup_help['docutils'],
+        help_text = markup_help['markdown'],
     )
     
     priority = models.PositiveIntegerField (_('priority'),
@@ -67,7 +66,7 @@ class LinkCategory (models.Model):
         ordering = ['priority']
     class Admin:
         fields = (
-            (None, {'fields': ('name', 'description_markup',),}),
+            (None, {'fields': ('name', 'description',),}),
             (_('Advanced'), {
                 'fields': ('easyname', 'priority', 'pub_date', 'icon', 'hidden'), 
                 'classes': 'collapse',
@@ -80,15 +79,11 @@ class LinkCategory (models.Model):
         return self.name
 
     def save (self):
-        parse_markup (self)
         if not self.id:
             self.crea_date = datetime.now()
         super(LinkCategory, self).save()
 
-    #def get_absolute_url (self):
-        #pass
-    
-    
+
 
 
 class PublicManager (models.Manager):
@@ -111,10 +106,9 @@ class Link (models.Model):
     name = models.CharField (_('name'), maxlength=200, )
     url = models.URLField (_('url'), verify_exists=False)
 
-    description = models.TextField (_('description'), editable=False,)
-    description_markup = models.TextField (_('description'), 
+    description = models.TextField (_('description'),
         blank=True,
-        help_text = markup_help['docutils']
+        help_text = markup_help['markdown'],
     )
 
     status = models.CharField (_('status'), maxlength=3, 
@@ -164,7 +158,7 @@ class Link (models.Model):
         search_fields = ('name',)
         fields = (
             (None, {'fields': ( ('name', 'url'), ('status', 'category',), 
-                'description_markup', 'tags',),}),
+                'description', 'tags',),}),
             (_('Via'), {'fields': ('via_name','via_url',),
                     'classes': 'collapse',}),
             (_('Advanced'), {'fields': ('easyname','pub_date',),
@@ -179,7 +173,3 @@ class Link (models.Model):
         if not self.id:
             self.crea_date = datetime.now()
         super(Link, self).save()
-
-    #def get_absolute_url (self):
-        #pass
-
