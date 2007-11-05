@@ -1,5 +1,5 @@
 from django.db import models, connection
-from misc.markup import markup_help, parse_markup
+from misc.markup import markup_help
 from datetime import datetime
 from tagging.fields import TagField
 
@@ -169,7 +169,6 @@ class Link (models.Model):
         return self.name
 
     def save (self):
-        parse_markup (self)
         if not self.id:
             self.crea_date = datetime.now()
         super(Link, self).save()
