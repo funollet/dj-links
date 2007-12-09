@@ -1,8 +1,9 @@
 from django.db import models, connection
-from misc.markup import markup_help
 from datetime import datetime
 from tagging.fields import TagField
 
+
+################################################################################
 
 STATUS_CHOICES = (
     ('drf', _('draft')),
@@ -10,6 +11,26 @@ STATUS_CHOICES = (
     ('pbl', _('public')),
     ('hid', _('hidden')),
     )
+
+################################################################################
+
+markup_help = {
+    'markdown': _('''<div class="markup_help"><pre>
+[un link][1]    *italica*    **negreta**    Titol     - un punt d'una llista
+                                            -----     - segon punt
+[1]: http://www.un.link.com                            - llista indentada
+</pre>(<a href="http://daringfireball.net/projects/markdown/basics">Markdown syntax)</a></div>'''),
+    'textile':  _('''<div class="markup_help">
+    Use <a href="http://daringfireball.net/projects/markdown/basics">Textile</a> Syntax</div>'''),
+    'docutils': _('''
+    <div class="markup_help"><pre>
+`un link`_    *italica*    **negreta**    Titol     - un punt d'una llista
+                                          -----     - segon punt
+.. _`un link`: http://www.google.com                 - llista indentada
+</pre>(<a href="http://docutils.sourceforge.net/docs/user/rst/quickstart.html">reST syntax</a>: documentation).
+    </div>'''),
+}
+
 
 class LinkCategory (models.Model):
 
