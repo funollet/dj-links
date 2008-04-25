@@ -1,6 +1,7 @@
 from django.db import models, connection
 from datetime import datetime
 from tagging.fields import TagField
+from django.utils.translation import ugettext as _
 
 
 ################################################################################
@@ -44,7 +45,7 @@ class LinkCategory (models.Model):
         except:
             return increment
     
-    name = models.CharField (_('name'), maxlength=200, )
+    name = models.CharField (_('name'), max_length=200, )
     
     description= models.TextField (_('description'),
         blank=True,
@@ -124,7 +125,7 @@ class PublicCategorizedManager (models.Manager):
 
 class Link (models.Model):
     """Link (url, name, description) with metadata: category, tags, and source."""
-    name = models.CharField (_('name'), maxlength=200, )
+    name = models.CharField (_('name'), max_length=200, )
     url = models.URLField (_('url'), verify_exists=False)
 
     description = models.TextField (_('description'),
@@ -132,7 +133,7 @@ class Link (models.Model):
         help_text = markup_help['markdown'],
     )
 
-    status = models.CharField (_('status'), maxlength=3, 
+    status = models.CharField (_('status'), max_length=3, 
         choices=STATUS_CHOICES,
         default='pbl',
         radio_admin=True,
@@ -144,7 +145,7 @@ class Link (models.Model):
     )
     
     via_name = models.CharField ( _('via (name)'), 
-        maxlength=200, 
+        max_length=200, 
         blank=True,
         help_text = 'Source of the link. Brief description.',
     )
