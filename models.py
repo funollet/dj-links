@@ -2,6 +2,7 @@ from django.db import models, connection
 from datetime import datetime
 from tagging.fields import TagField
 from django.utils.translation import ugettext as _
+from links.managers import *
 
 
 ################################################################################
@@ -60,7 +61,6 @@ class LinkCategory (models.Model):
     
     easyname = models.SlugField (_('easyname'),
         unique=True,
-        prepopulate_from=('name',),
         help_text = _('Easy-to-link name (good, if short, twice good).'),
     )
     
@@ -69,7 +69,7 @@ class LinkCategory (models.Model):
     crea_date = models.DateTimeField (_('creation date'), editable=False,)
 
     icon = models.ImageField (_('icon'),
-        upload_to = 'events/category',
+        upload_to = 'links/category',
         blank = True,
         height_field = 'icon_height', width_field = 'icon_width',
         help_text = _('Optional icon for the category.'),
@@ -86,15 +86,6 @@ class LinkCategory (models.Model):
         verbose_name = _('link category')
         verbose_name_plural = _('link categories')
         ordering = ['priority']
-    class Admin:
-        fields = (
-            (None, {'fields': ('name', 'description',),}),
-            (_('Advanced'), {
-                'fields': ('easyname', 'priority', 'pub_date', 'icon', 'hidden'), 
-                'classes': 'collapse',
-            } ),
-        )
-        list_display = ('name', 'priority',)
 
     
     def __unicode__ (self):
@@ -104,22 +95,6 @@ class LinkCategory (models.Model):
         if not self.id:
             self.crea_date = datetime.now()
         super(LinkCategory, self).save()
-
-
-
-
-class PublicManager (models.Manager):
-    def get_query_set (self):
-        return super(PublicManager, self).get_query_set().filter(status='pbl')
-
-class CategorizedManager (models.Manager):
-    def get_query_set (self):
-        return super(CategorizedManager, self).get_query_set().order_by('category', 'pub_date',)
-
-class PublicCategorizedManager (models.Manager):
-    def get_query_set (self):
-        return super(PublicCategorizedManager,
-            self).get_query_set().filter(status='pbl').order_by('category', 'pub_date',)
 
 
 
@@ -136,7 +111,6 @@ class Link (models.Model):
     status = models.CharField (_('status'), max_length=3, 
         choices=STATUS_CHOICES,
         default='pbl',
-        radio_admin=True,
         )
     
     category = models.ForeignKey ( LinkCategory,
@@ -157,10 +131,7 @@ class Link (models.Model):
     pub_date = models.DateTimeField (_('publication date'), default=datetime.now,)
     modif_date = models.DateTimeField (_('modification date'), default=datetime.now, editable=False,)
     crea_date = models.DateTimeField (_('creation date'), editable=False,)
-    easyname = models.SlugField (_('easyname'),
-        prepopulate_from = ('name',),
-        unique = True,
-    )
+    easyname = models.SlugField (_('easyname'), unique = True,)
     tags = TagField()
 
     objects = models.Manager()
@@ -173,19 +144,6 @@ class Link (models.Model):
         verbose_name_plural = _('links')
         order_with_respect_to = 'category'
         ordering = ['pub_date']
-
-    class Admin:
-        list_display = ('name', 'url', 'pub_date',)
-        list_filter = ('status', 'category',)
-        search_fields = ('name',)
-        fields = (
-            (None, {'fields': ( ('name', 'url'), ('status', 'category',), 
-                'description', 'tags',),}),
-            (_('Via'), {'fields': ('via_name','via_url',),
-                    'classes': 'collapse',}),
-            (_('Advanced'), {'fields': ('easyname','pub_date',),
-                    'classes': 'collapse',}),
-        )
 
     def __unicode__ (self):
         return self.name
